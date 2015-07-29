@@ -1,0 +1,26 @@
+{
+  "name": "jquery-most",
+  "version": "0.1.2",
+  "homepage": "https://github.com/kbarbounakis/jquery-most",
+  "authors": [
+    "Kyriakos Barbounakis <k.barbounakis@gmail.com>"
+  ],
+  "description": "JQuery Extension for MOST Web Framework",
+  "main": "jquery-most.js",
+  "keywords": [
+    "most",
+    "jquery",
+    "data"
+  ],
+  "license": "BSD 3-Clause",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.0.3"
+  }
+}
