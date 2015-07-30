@@ -17,6 +17,234 @@
     if (typeof $ === 'undefined') { $ = window.jQuery; }
 
     /**
+     * @class {MostClientDataField}
+     * @param name
+     * @constructor
+     */
+    function MostDataField(name) {
+        if (typeof name !== 'string') {
+            throw new Error('Invalid argument type. Expected string.')
+        }
+        this.name = name;
+    }
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.length = function() {
+        return String.prototype.format('length(%s)', this.name);
+    };
+
+    /**
+     * @param {String} s
+     * @returns {string}
+     */
+    MostDataField.prototype.indexOf = function(s) {
+        return String.prototype.format('indexof(%s,%s)', this.name, MostClientDataQueryable.escape(s));
+    };
+
+    /**
+     * @param {number} pos
+     * @param {number} length
+     * @returns {string}
+     */
+    MostDataField.prototype.substr = function(pos, length) {
+        return String.prototype.format('substring(%s,%s,%s)',this.name, pos, length);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.floor = function() {
+        return String.prototype.format('floor(%s)',this.name);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.round = function() {
+        return String.prototype.format('round(%s)',this.name);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.getYear = function() {
+        return String.prototype.format('year(%s)',this.name);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.getDay = function() {
+        return String.prototype.format('day(%s)',this.name);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.getMonth = function() {
+        return String.prototype.format('month(%s)',this.name);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.getMinutes = function() {
+        return String.prototype.format('minute(%s)',this.name);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.getHours = function() {
+        return String.prototype.format('hour(%s)',this.name);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.getSeconds = function() {
+        return String.prototype.format('second(%s)',this.name);
+    };
+
+    ///**
+    // * @returns {string}
+    // */
+    //MostDataField.prototype.ceil = function() {
+    //    return String.prototype.format('ceil(%s)',this.name);
+    //};
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.toLocaleLowerCase = function() {
+        return String.prototype.format('tolower(%s)',this.name);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.toLowerCase = function() {
+        return String.prototype.format('tolower(%s)',this.name);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.toLocaleUpperCase = function() {
+        return String.prototype.format('toupper(%s)',this.name);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.toUpperCase = function() {
+        return String.prototype.format('toupper(%s)',this.name);
+    };
+
+    /**
+     * @returns {string}
+     */
+    MostDataField.prototype.trim = function() {
+        return String.prototype.format('trim(%s)',this.name);
+    };
+
+    /**
+     * @param {*} s0
+     * @returns {string}
+     */
+    MostDataField.prototype.concat = function(s0) {
+        var res = 'concat(' + this.name;
+        for (var i = 0; i < arguments.length; i++) {
+            res += ',' + MostClientDataQueryable.escape(s);
+        }
+        res += ')';
+        return res;
+    };
+
+    ///**
+    // * @param {*} s
+    // * @returns {string}
+    // */
+    //MostDataField.prototype.substring = function(s) {
+    //    return String.prototype.format('substringof(%s,%s)',this.name,MostClientDataQueryable.escape(s));
+    //};
+
+    /**
+     * @param {*} s
+     * @returns {string}
+     */
+    MostDataField.prototype.endsWith = function(s) {
+        return String.prototype.format('endswith(%s,%s)',this.name, MostClientDataQueryable.escape(s));
+    };
+
+    /**
+     * @param {*} s
+     * @returns {string}
+     */
+    MostDataField.prototype.startsWith = function(s) {
+        return String.prototype.format('startswith(%s,%s)',this.name, MostClientDataQueryable.escape(s));
+    };
+
+    if (typeof String.prototype.fieldOf === 'undefined')
+    {
+        /**
+         * @returns {MostDataField}
+         */
+        var fieldOf = function() {
+            if (this == null) {
+                throw new TypeError('String.prototype.fieldOf called on null or undefined');
+            }
+            return new MostDataField(this);
+        };
+        if (!String.prototype.fieldOf) { String.prototype.fieldOf = fieldOf; }
+    }
+
+    if (typeof String.prototype.format === 'undefined')
+    {
+        /**
+         * @returns {*}
+         */
+        var format = function(f) {
+            var i;
+            if (typeof f !== 'string') {
+                var objects = [];
+                for (i  = 0; i < arguments.length; i++) {
+                    objects.push(inspect(arguments[i]));
+                }
+                return objects.join(' ');
+            }
+            i = 1;
+            var args = arguments;
+            var len = args.length;
+            var str = String(f).replace(/%[sdj%]/g, function (x) {
+                if (x === '%%') return '%';
+                if (i >= len) return x;
+                switch (x) {
+                    case '%s':
+                        return String(args[i++]);
+                    case '%d':
+                        return Number(args[i++]);
+                    case '%j':
+                        return JSON.stringify(args[i++]);
+                    default:
+                        return x;
+                }
+            });
+            for (var x = args[i]; i < len; x = args[++i]) {
+                if (x === null || typeof x !== 'object') {
+                    str += ' ' + x;
+                } else {
+                    str += ' ' + inspect(x);
+                }
+            }
+            return str;
+        };
+        if (!String.prototype.format) { String.prototype.format = format; }
+    }
+
+    /**
      * @class MostClient
      * @param {string=} url
      * @constructor
@@ -31,13 +259,45 @@
      * @returns {MostClientDataQueryable}
      */
     MostClient.prototype.model = function(name) {
+        var q = new MostClientDataQueryable(name);
+        q.url = this.url;
+        return q;
+    };
+
+    /**
+     * @param {string} name
+     * @returns {MostClientDataQueryable}
+     */
+    MostClient.prototype.field = function(name) {
         return new MostClientDataQueryable(name);
     };
 
+    /**
+     * @class MostClientDataService
+     * @param {string} url
+     * @constructor
+     */
+    function MostClientDataService() {
+        //
+    }
+
+    /**
+     * @param {MostClientDataQueryable|*} q
+     * @returns {*}
+     */
+    MostClientDataService.prototype.get = function(q) {
+        var url = q.url + String.prototype.format('%s/index.json', q.$model), data = {};
+        var copy = MostClientDataQueryable.prototype.copy.call(q);
+        for (var key in copy) {
+            if (copy.hasOwnProperty(key) && /^\$/.test(key)) { data[key] = copy[key]; }
+        }
+        return $.get(url, data);
+    };
 
     /**
      * @class MostClientDataQueryable
      * @param {string=} model the target model
+     * @property {string} url - Gets or sets a string that represents the base service url
      * @property {string} $filter - Gets or sets a string that represents a query expression e.g. name eq 'John'
      * @property {string} $select - Gets or sets a comma delimited string that represents the fields to be returned e.g. id,name,description
      * @property {string} $groupby - Gets or sets a comma delimited string that represents the fields to be used in group expression e.g. id,name
@@ -61,12 +321,11 @@
          * @private
          */
         this.privates = { };
-
     }
 
     MostClientDataQueryable.prototype.copy = function() {
         var self = this, result = new MostClientDataQueryable();
-        var keys = Object.keys(this);
+        var keys = Object.keys(self);
         keys.forEach(function(key) { if (key.indexOf('$')==0) {
             result[key] = self[key];
         }
@@ -93,7 +352,7 @@
         i = 1;
         var args = arguments;
         var len = args.length;
-        var str = String(f).replace(formatRegExp, function (x) {
+        var str = String(f).replace(/%[sdj%]/g, function (x) {
             if (x === '%%') return '%';
             if (i >= len) return x;
             switch (x) {
@@ -237,26 +496,6 @@
             this.$model = name;
         return this;
     };
-    /**
-     *
-     * @param {boolean|*=} value
-     * @returns {MostClientDataQueryable}
-     */
-    MostClientDataQueryable.prototype.inlineCount = function(value) {
-        if (typeof value === 'undefined')
-            this.$inlinecount = true;
-        else
-            this.$inlinecount = value;
-        return this;
-    };
-    /**
-     *
-     * @param {boolean|*=} value
-     * @returns {MostClientDataQueryable}
-     */
-    MostClientDataQueryable.prototype.paged = function(value) {
-        return this.inlineCount(value);
-    };
 
     /**
      * @param {Boolean} value
@@ -397,11 +636,13 @@
 
     /**
      * @param {number} val
-     * @returns MostClientDataQueryable
+     * @returns *
      */
     MostClientDataQueryable.prototype.take = function(val) {
         this.$top = val;
-        return this;
+        this.$inlinecount = true;
+        var svc = new MostClientDataService();
+        return svc.get(this);
     };
     /**
      * @returns MostClientDataQueryable
@@ -516,218 +757,10 @@
         return this.equal(value);
     };
 
-    /**
-     * @param {String} name
-     * @param {String} s
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.indexOf = function(name, s) {
-        this.privates.left = 'indexof(' + name + ', ' + MostClientDataQueryable.escape(s) +')';
-        return this;
-    };
 
-    /**
-     * @param {String} name
-     * @param {String} s
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.andIndexOf = function(name, s) {
-        this.privates.lop = 'and';
-        return this.indexOf(name, s);
-    };
-
-    /**
-     * @param {String} name
-     * @param {String} s
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.orIndexOf = function(name, s) {
-        this.privates.lop = 'or';
-        return this.indexOf(name, s);
-    };
-
-    /**
-     * @param {*} name
-     * @param {*} s
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.endsWith = function(name, s) {
-        this.privates.left = String.format('endswith(%s,%s)',name,MostClientDataQueryable.escape(s));
-        return this;
-    };
-
-    /**
-     * @param {*} name
-     * @param {*} s
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.startsWith = function(name, s) {
-        this.privates.left = String.format('startswith(%s,%s)',name,MostClientDataQueryable.escape(s));
-        return this;
-    };
-
-    /**
-     * @param {*} name
-     * @param {*} s
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.substringOf = function(name, s) {
-        this.privates.left = String.format('substringof(%s,%s)',name,MostClientDataQueryable.escape(s));
-        return this;
-    };
-
-    /**
-     * @param {*} name
-     * @param {number} pos
-     * @param {number} length
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.substring = function(name, pos, length) {
-        this.privates.left = String.format('substring(%s,%s,%s)',name,pos,length);
-        return this;
-    };
-
-    /**
-     * @param {*} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.length = function(name) {
-        this.privates.left = String.format('length(%s)',name);
-        return this;
-    };
-
-    /**
-     * @param {*} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.toLower = function(name) {
-        this.privates.left = String.format('tolower(%s)',name);
-        return this;
-    };
-
-    /**
-     * @param {*} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.toUpper = function(name) {
-        this.privates.left = String.format('toupper(%s)',name);
-        return this;
-    }
-
-    /**
-     * @param {*} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.trim = function(name) {
-        this.privates.left = String.format('trim(%s)',name);
-        return this;
-    };
-
-    /**
-     * @param {*} s0
-     * @param {*} s1
-     * @param {*=} s2
-     * @param {*=} s3
-     * @param {*=} s4
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.concat = function(s0, s1, s2, s3, s4) {
-        this.privates.left = 'concat(' + MostClientDataQueryable.escape(s0) + ',' + MostClientDataQueryable.escape(s1);
-        if (typeof s2 !== 'undefined')
-            this.privates.left +=',' + MostClientDataQueryable.escape(s2);
-        if (typeof s3 !== 'undefined')
-            this.privates.left +=',' + MostClientDataQueryable.escape(s3);
-        if (typeof s4 !== 'undefined')
-            this.privates.left +=',' + MostClientDataQueryable.escape(s4);
-        this.privates.left +=')';
-        return this;
-    };
 
     MostClientDataQueryable.prototype.field = function(name) {
         return { "$name":name }
-    };
-
-    /**
-     * @param {String} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.day = function(name) {
-        this.privates.left = String.format('day(%s)',name);
-        return this;
-    };
-
-    /**
-     * @param {String} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.day = function(name) {
-        this.privates.left = String.format('hour(%s)',name);
-        return this;
-    };
-
-    /**
-     * @param {String} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.minute = function(name) {
-        this.privates.left = String.format('minute(%s)',name);
-        return this;
-    };
-
-    /**
-     * @param {String} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.month = function(name) {
-        this.privates.left = String.format('month(%s)',name);
-        return this;
-    };
-
-
-    /**
-     * @param {String} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.second = function(name) {
-        this.privates.left = String.format('second(%s)',name);
-        return this;
-    };
-
-
-    /**
-     * @param {String} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.year = function(name) {
-        this.privates.left = String.format('year(%s)',name);
-        return this;
-    };
-
-    /**
-     * @param {String} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.round = function(name) {
-        this.privates.left = String.format('round(%s)',name);
-        return this;
-    };
-
-    /**
-     * @param {String} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.floor = function(name) {
-        this.privates.left = String.format('floor(%s)',name);
-        return this;
-    };
-
-    /**
-     * @param {String} name
-     * @returns MostClientDataQueryable
-     */
-    MostClientDataQueryable.prototype.ceiling = function(name) {
-        this.privates.left = util.ceiling('floor(%s)',name);
-        return this;
     };
 
     /**
